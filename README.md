@@ -3,7 +3,7 @@
 A simulated electronics merchant case desk for the Paytm Build for India AI Hackathon, Track 3. It explores reconciliation when payment, order, stock and customer records disagree. All records, people and amounts are fictional.
 
 ## Run
-Open `dist/index.html` in a modern browser. Run `node test.cjs` to check the case decisions. There are no dependencies or credentials.
+Open `index.html` in a modern browser. Run `node test.cjs` to check the case decisions. There are no dependencies or credentials.
 
 ## What works
 Eight hand-authored cases show deterministic decision logic and explanations. Approving a simulated duplicate refund and simulating customer credit update the view. Enquiry, quote, inventory, message and service details are linked synthetic fixtures; service booking and order confirmation are narrative outcomes, not persisted backend transactions. This is a rules-based prototype; it does not call an AI model or actual payment, messaging, order or inventory APIs. Refresh resets the demo. A timeout scenario illustrates a backend lookup in fixture data; it does not prove production idempotency or concurrent inventory locking.
