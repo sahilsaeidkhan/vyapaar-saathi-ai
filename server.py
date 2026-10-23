@@ -14,11 +14,18 @@ class Handler(SimpleHTTPRequestHandler):
    body=b'{"synthetic":true}';self.send_response(200);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body);return
   super().do_GET()
  def do_POST(self):
-  if self.path!='/api/run':self.send_error(404);return
+  if self.path not in ('/api/run','/api/configure'):self.send_error(404);return
+  if self.headers.get('Origin')!='http://127.0.0.1:8766' or self.headers.get('Content-Type')!='application/json':self.send_error(403);return
   try:
    n=int(self.headers.get('Content-Length','0'))
    if n<1 or n>5000:raise ValueError('invalid request length')
-   data=json.loads(self.rfile.read(n));id=data.get('case_id','');request=data.get('request','')
+   data=json.loads(self.rfile.read(n))
+   if self.path=='/api/configure':
+    key=data.get('key','')
+    if not isinstance(key,str) or not key.startswith('sk-or-v1-') or len(key)>300:raise ValueError('invalid key')
+    os.environ['MODEL_API_KEY']=key;os.environ['MODEL_API_URL']='https://openrouter.ai/api/v1/chat/completions';os.environ['MODEL_NAME']='openrouter/free'
+    body=b'{"configured":true}';self.send_response(200);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body);return
+   id=data.get('case_id','');request=data.get('request','')
    if id not in ('late','pending','duplicate','timeout','race','refund','missing','service'):raise ValueError('unknown case')
    if os.environ.get('MODEL_API_KEY'):
     model=ModelAdapter();mode='configured model'
