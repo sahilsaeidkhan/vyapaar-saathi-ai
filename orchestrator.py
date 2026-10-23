@@ -23,11 +23,11 @@ class Sandbox:
    if not c:r={'status':'escalate','reason':'missing case'}
    elif action=='confirm_order':
     if c['order_status']=='confirmed':r={'status':'already_confirmed'}
-    elif c['payment']!='captured' or c['stock']<1:r={'status':'escalate','reason':'payment or stock unverified'}
+    elif c['payment']!='captured' or c['stock']<1:return {'status':'escalate','reason':'payment or stock unverified'}
     else:self.db.execute('UPDATE cases SET order_status=?,stock=stock-1 WHERE id=?',('confirmed',id));r={'status':'confirmed'}
    elif action=='initiate_refund':
     if not approved:return {'status':'approval_required'}
-    elif c['payment']!='captured' or c['captured_attempts']<2:r={'status':'escalate','reason':'duplicate captured payments not verified'}
+    elif c['payment']!='captured' or c['captured_attempts']<2:return {'status':'escalate','reason':'duplicate captured payments not verified'}
     elif c['refund_status']!='none':r={'status':'already_initiated'}
     else:self.db.execute('UPDATE cases SET refund_status=? WHERE id=?',('initiated',id));r={'status':'initiated_not_credited'}
    elif action=='escalate':r={'status':'escalated'}

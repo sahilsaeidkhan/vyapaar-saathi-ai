@@ -34,7 +34,12 @@ class Handler(SimpleHTTPRequestHandler):
      enquiry=journey.create_enquiry('enquiry:'+case_id,'Synthetic customer','Synthetic appliance')
      quote=journey.create_quote('quote:'+case_id,enquiry[0],4200)
      result={'enquiry':enquiry,'quote':quote}
-    elif op=='approve_quote':result={'quote':journey.approve_quote('quote:'+case_id)}
+    elif op=='approve_quote':result=journey.approve_quote('quote:'+case_id)
+    elif op=='capture':result=journey.capture_payment('order:quote:'+case_id)
+    elif op=='confirm':result=sandbox.execute('order:quote:'+case_id,'confirm_order','journey-confirm:'+case_id)
+    elif op=='deliver':result=journey.mark_delivered('order:quote:'+case_id)
+    elif op=='journey_service':result=journey.request_service('journey-service:'+case_id,'order:quote:'+case_id)
+    elif op=='schedule':result=journey.schedule('journey-service:'+case_id,data.get('technician','Technician A'),data.get('slot','10:00'))
     elif op=='service':result=journey.request_service('service:'+case_id,case_id)
     else:raise ValueError('unknown operation')
     body=json.dumps(result).encode();self.send_response(200);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body);return
